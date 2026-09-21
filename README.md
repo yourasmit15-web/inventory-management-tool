@@ -1,102 +1,262 @@
 # Inventory Management Tool
 
-A desktop inventory management application built with **Java Swing**, **SQLite**, **Maven**, and **BCrypt**. It provides a practical interface for managing products, monitoring stock, searching inventory, and controlling access through user roles.
+A fresher-friendly desktop **Inventory Management System** built with **Java 17, Swing, SQLite, Maven, BCrypt, and FlatLaf**.
 
-> **Project:** Inventory Management Tool  
-> **Type:** Java desktop application  
-> **Build:** Maven  
-> **Database:** SQLite
+## Features
 
-## ✨ Features
+- Secure login with BCrypt password hashing
+- Two roles: **Admin** and **User**
+- Admin-only product mutations
+- Add, edit, delete, and restock products
+- Product search and category filtering
+- Low-stock and out-of-stock monitoring
+- Inventory value calculation
+- Local SQLite database; no MySQL server required
+- Executable fat JAR produced by Maven
+- Automated build + unit tests with GitHub Actions
 
-- 🔐 User authentication with password hashing
-- 👥 Role-based access control
-- 📦 Product creation, editing, deletion, and inventory management
-- 📊 Stock status visibility
-- 🔎 Product search and filtering
-- 💾 Lightweight SQLite database storage
-- 🖥️ Java Swing desktop interface
-- ⚙️ Maven-based project structure
-- 🤖 GitHub Actions build workflow
+## Technology Stack
 
-## 🧰 Technology Stack
-
-| Technology | Purpose |
+| Technology | Version / Purpose |
 |---|---|
-| Java | Application development |
-| Swing | Desktop user interface |
-| SQLite | Local database |
-| BCrypt | Password hashing |
-| Maven | Dependency and build management |
-| GitHub Actions | Automated build workflow |
+| Java | 17 |
+| Swing | Desktop GUI |
+| SQLite JDBC | 3.45.1.0 |
+| BCrypt | 0.4 |
+| FlatLaf | 3.4.1 |
+| Maven | Build/dependency management |
+| JUnit 5 | Automated tests |
+| GitHub Actions | CI |
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 inventory-management-tool/
-├── .github/
-│   └── workflows/
-│       └── build.yml
+├── .github/workflows/build.yml
 ├── src/
-│   └── main/
-│       └── java/com/inventory/
-│           ├── App.java
-│           ├── db/
-│           │   └── DatabaseManager.java
-│           ├── model/
-│           │   ├── Product.java
-│           │   └── User.java
-│           ├── ui/
-│           │   ├── LoginFrame.java
-│           │   ├── MainFrame.java
-│           │   ├── ProductDialog.java
-│           │   └── ProductTableModel.java
-│           └── util/
-│               └── PasswordUtil.java
+│   ├── main/java/com/inventory/
+│   │   ├── App.java
+│   │   ├── db/DatabaseManager.java
+│   │   ├── model/Product.java
+│   │   ├── model/User.java
+│   │   ├── ui/LoginFrame.java
+│   │   ├── ui/MainFrame.java
+│   │   ├── ui/ProductDialog.java
+│   │   ├── ui/ProductTableModel.java
+│   │   └── util/PasswordUtil.java
+│   └── test/java/com/inventory/
+│       ├── model/ProductTest.java
+│       └── util/PasswordUtilTest.java
 ├── .gitignore
 ├── pom.xml
 └── README.md
 ```
 
-## 🚀 Getting Started
+## Windows Setup
 
-### Prerequisites
+### 1. Install JDK 17
 
-- Java JDK installed
-- Maven installed and available on your PATH
+Verify the JDK:
 
-### Build
+```bat
+java -version
+javac -version
+```
 
-```bash
+Both commands should report Java 17.
+
+### 2. Install Maven
+
+Verify Maven:
+
+```bat
+mvn -version
+```
+
+If Windows says:
+
+```text
+'mvn' is not recognized as an internal or external command
+```
+
+Maven is not installed or its `bin` directory is not in PATH.
+
+After installing Maven, **close Terminal and open a new Terminal** before testing `mvn -version` again.
+
+### 3. Clone the project
+
+```bat
+git clone https://github.com/yourasmit15-web/inventory-management-tool.git
+cd inventory-management-tool
+```
+
+### 4. Run tests and build
+
+```bat
+mvn clean test
 mvn clean package
 ```
 
-### Run
+The packaged application is:
 
-Run the application from your IDE using `com.inventory.App`, or run the generated Maven artifact according to the project's build configuration.
+```text
+target\inventory-app.jar
+```
 
-## 🔐 Security
+### 5. Start the application
 
-Passwords are handled through BCrypt hashing rather than storing plaintext passwords in the application logic. Database access is encapsulated by the application's database layer.
+```bat
+java -jar target\inventory-app.jar
+```
 
-## 🔄 CI
+The application creates `inventory.db` automatically in the directory from which it is started.
 
-The repository includes a GitHub Actions workflow under `.github/workflows/build.yml` for automated project builds.
+## Demo Accounts
 
-## 🎯 Project Purpose
+The first database initialization creates:
 
-The Inventory Management Tool is designed as a compact, practical desktop solution for learning and demonstrating software development concepts including GUI programming, database integration, authentication, CRUD operations, role-based access, and automated builds.
+| Username | Password | Role |
+|---|---|---|
+| admin | admin123 | Admin |
+| user | user123 | User |
 
-## 📌 Repository Status
+**Admin:** can add, edit, delete, and restock products.
 
-This repository contains the original application source code from the supplied project archive. The application source has been uploaded without intentional functional changes; repository documentation is provided to make the project easier to understand, build, and maintain.
+**User:** can log in, search, filter, refresh, and view inventory information. Product mutation controls are disabled.
 
-## 👨‍💻 Author
+These are development/demo credentials. Change the seeding strategy before using the application for real business data.
+
+## Database
+
+The application uses SQLite, so no separate MySQL installation or database server is required.
+
+On first launch:
+
+1. `inventory.db` is created.
+2. `users` and `products` tables are created.
+3. Demo users are inserted if the user table is empty.
+4. Sample products are inserted during first-time initialization.
+
+Do not delete `inventory.db` if you want to keep your local inventory data.
+
+## Build Output
+
+Maven's assembly plugin creates a self-contained JAR:
+
+```text
+target/inventory-app.jar
+```
+
+It includes the application dependencies, so the normal launch command is simply:
+
+```bat
+java -jar target\inventory-app.jar
+```
+
+A Java 17 runtime is still required.
+
+## Testing
+
+Run:
+
+```bat
+mvn test
+```
+
+Current automated tests cover:
+
+- Product stock-status rules
+- Product total-value calculation
+- BCrypt password hashing and verification
+
+## Architecture
+
+```text
+App
+ │
+ ▼
+LoginFrame ──────► DatabaseManager ──────► SQLite
+ │                       │
+ │                       ├── Authentication
+ ▼                       ├── Product CRUD
+MainFrame ◄──────────────┼── Search/filter
+ │                       └── Stock statistics
+ ├── ProductTableModel
+ └── ProductDialog
+```
+
+The UI is separated from the database layer and domain models, making the project easier to explain and extend.
+
+## Important Design Decisions
+
+### Why SQLite?
+
+This is a desktop application intended for a BCA-level project. SQLite keeps installation simple because the database is a local file rather than a separate server.
+
+### Why BCrypt?
+
+Passwords should not be stored as plaintext. BCrypt stores a one-way password hash and verifies login attempts against that hash.
+
+### Why Maven?
+
+Maven manages third-party dependencies such as SQLite JDBC, BCrypt, and FlatLaf and produces a repeatable build.
+
+## Troubleshooting
+
+### Maven not recognized
+
+Run:
+
+```bat
+mvn -version
+```
+
+If it fails, install Maven and add its `bin` directory to the Windows PATH, then restart Terminal.
+
+### Java version is wrong
+
+Run:
+
+```bat
+java -version
+```
+
+The project targets Java 17. Use a JDK 17 installation and make sure `JAVA_HOME`/PATH point to it.
+
+### Application opens but login fails
+
+If this is a fresh installation, close the application and run it again. The initial database seed creates the demo accounts.
+
+### Database problems after changing the schema
+
+For a development reset only, close the application and remove:
+
+```text
+inventory.db
+```
+
+The next launch will create a fresh database with the demo data.
+
+**Warning:** deleting `inventory.db` permanently removes the local inventory data stored in that file.
+
+## CI
+
+GitHub Actions uses JDK 17 and runs:
+
+```text
+mvn -B clean package
+```
+
+The build includes automated tests and produces the executable JAR as a workflow artifact.
+
+## Viva Explanation
+
+A simple explanation for a BCA viva:
+
+> "This is a Java Swing desktop inventory management system. The presentation layer uses Swing, the application logic is organized around the UI and database classes, and SQLite stores users and products locally. BCrypt is used for password hashing. Maven manages dependencies and packaging, while GitHub Actions automatically builds and tests the project."
+
+## Author
 
 **Asmit Mishra**
 
-GitHub: [@yourasmit15-web](https://github.com/yourasmit15-web)
-
----
-
-⭐ If you find this project useful, consider starring the repository.
+GitHub: https://github.com/yourasmit15-web
