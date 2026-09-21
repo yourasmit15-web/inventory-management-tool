@@ -177,6 +177,14 @@ public class MainFrame extends JFrame {
         JButton restockBtn = toolBtn("📦 Restock",  new Color(230,81,0),  e -> doRestock());
         JButton refreshBtn = toolBtn("↺ Refresh",   new Color(96,96,96),  e -> loadData(db.getAllProducts()));
 
+        // Only administrators may mutate inventory. Read-only users can still
+        // search, filter, refresh, and inspect stock information.
+        boolean admin = currentUser.isAdmin();
+        addBtn.setEnabled(admin);
+        editBtn.setEnabled(admin);
+        deleteBtn.setEnabled(admin);
+        restockBtn.setEnabled(admin);
+
         bar.add(searchField); bar.add(catFilter); bar.add(searchBtn);
         bar.add(new JSeparator(JSeparator.VERTICAL));
         bar.add(addBtn); bar.add(editBtn); bar.add(deleteBtn); bar.add(restockBtn);
@@ -250,7 +258,7 @@ public class MainFrame extends JFrame {
         // Double-click to edit
         table.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) doEdit();
+                if (e.getClickCount() == 2 && currentUser.isAdmin()) doEdit();
             }
         });
 
@@ -310,7 +318,14 @@ public class MainFrame extends JFrame {
         status("Category: " + cat + " — " + results.size() + " product(s)");
     }
 
+    private boolean requireAdmin() {
+        if (currentUser.isAdmin()) return true;
+        alert("Administrator access is required for this action.");
+        return false;
+    }
+
     private void doAdd() {
+        if (!requireAdmin()) return;
         ProductDialog dlg = new ProductDialog(this, "Add Product", null, db.getCategories());
         dlg.setVisible(true);
         if (dlg.isConfirmed()) {
@@ -321,6 +336,7 @@ public class MainFrame extends JFrame {
     }
 
     private void doEdit() {
+        if (!requireAdmin()) return;
         int row = table.getSelectedRow();
         if (row < 0) { alert("Select a product to edit."); return; }
         Product p = tableModel.getProductAt(table.convertRowIndexToModel(row));
@@ -334,6 +350,7 @@ public class MainFrame extends JFrame {
     }
 
     private void doDelete() {
+        if (!requireAdmin()) return;
         int row = table.getSelectedRow();
         if (row < 0) { alert("Select a product to delete."); return; }
         Product p = tableModel.getProductAt(table.convertRowIndexToModel(row));
@@ -348,6 +365,7 @@ public class MainFrame extends JFrame {
     }
 
     private void doRestock() {
+        if (!requireAdmin()) return;
         int row = table.getSelectedRow();
         if (row < 0) { alert("Select a product to restock."); return; }
         Product p = tableModel.getProductAt(table.convertRowIndexToModel(row));
