@@ -2,7 +2,7 @@ name: Build & Package
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, professional-hardening ]
   pull_request:
     branches: [ main, master ]
 
@@ -21,12 +21,13 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build fat JAR with Maven
-        run: mvn clean package -DskipTests
+      - name: Build, test and package
+        run: mvn -B clean package
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
           name: inventory-app
           path: target/inventory-app.jar
+          if-no-files-found: error
           retention-days: 30
